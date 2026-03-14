@@ -29,3 +29,6 @@ webhook_trigger.log
 # OS files
 .DS_Store
 Thumbs.db
+
+# VS Code
+.vscode/
