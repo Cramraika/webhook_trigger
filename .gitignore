@@ -13,6 +13,9 @@ venv/
 webhook_results.json
 webhook_trigger.log
 
+# Data files (operational data, not source code)
+*.csv
+
 # Claude Code
 .claude/settings.local.json
 .claude/memory.db

@@ -29,7 +29,7 @@ class RateLimiter:
         self.lock = Lock()
         self.last_request_time = 0
         self.semaphore = Semaphore(max_concurrent)
-        
+
     def wait_if_needed(self):
         """Ensures proper rate limiting between requests"""
         with self.lock:
@@ -38,7 +38,7 @@ class RateLimiter:
             if time_since_last < self.rate_limit:
                 time.sleep(self.rate_limit - time_since_last)
             self.last_request_time = time.time()
-    
+
     def adjust_rate(self, new_rate_limit):
         with self.lock:
             self.rate_limit = new_rate_limit
@@ -58,9 +58,9 @@ def make_request(url, method, payload, header, retries, rate_limiter, pbar, resu
     with rate_limiter.semaphore:
         # Wait according to rate limit
         rate_limiter.wait_if_needed()
-        
+
         start_time = time.time()
-        
+
         for attempt in range(retries):
             try:
                 # Determine HTTP method
@@ -68,7 +68,7 @@ def make_request(url, method, payload, header, retries, rate_limiter, pbar, resu
                     method_to_use = "POST" if payload else "GET"
                 else:
                     method_to_use = method.upper()
-                
+
                 # Prepare headers
                 headers = None
                 if header:
@@ -105,13 +105,13 @@ def make_request(url, method, payload, header, retries, rate_limiter, pbar, resu
                         response = requests.request(method_to_use, url, json=data, headers=headers, timeout=request_timeout)
                     else:
                         response = requests.request(method_to_use, url, headers=headers, timeout=request_timeout)
-                
+
                 # Handle response
                 if response.status_code == 200:
                     # Limit response output for large responses
                     response_preview = response.text[:200] + "..." if len(response.text) > 200 else response.text
                     logger.info(f"Success: {url}, Response: {response_preview}")
-                    
+
                     # Track result
                     results_tracker.add_result({
                         'url': url,
@@ -122,17 +122,17 @@ def make_request(url, method, payload, header, retries, rate_limiter, pbar, resu
                         'response_time': time.time() - start_time,
                         'attempt': attempt + 1
                     })
-                    
+
                     pbar.update(1)
                     return 0
                 else:
                     logger.error(f"Error: {url}, Status Code: {response.status_code}")
-                    
+
             except requests.exceptions.Timeout:
                 logger.error(f"Timeout error for {url} (attempt {attempt + 1}/{retries})")
             except Exception as e:
                 logger.error(f"Error: {url}, Exception: {e} (attempt {attempt + 1}/{retries})")
-            
+
             if attempt < retries - 1:
                 time.sleep(1)  # Wait before retrying
 
@@ -146,7 +146,7 @@ def make_request(url, method, payload, header, retries, rate_limiter, pbar, resu
             'response_time': time.time() - start_time,
             'attempt': retries
         })
-        
+
         pbar.update(1)
         return 1
 
@@ -154,11 +154,11 @@ class ResultsTracker:
     def __init__(self):
         self.results = []
         self.lock = Lock()
-    
+
     def add_result(self, result):
         with self.lock:
             self.results.append(result)
-    
+
     def save_results(self, filename='webhook_results.json'):
         with self.lock:
             try:
@@ -176,14 +176,14 @@ def read_csv_in_chunks(csv_file, chunk_size=1000, skip_rows=0):
             chunk = []
             row_count = 0
             skipped_count = 0
-            
+
             for row in reader:
                 # Skip rows if needed
                 if row_count < skip_rows:
                     row_count += 1
                     skipped_count += 1
                     continue
-                    
+
                 if 'webhook_url' in row and row['webhook_url'].strip():
                     webhook_data = (
                         row['webhook_url'].strip(),
@@ -196,10 +196,10 @@ def read_csv_in_chunks(csv_file, chunk_size=1000, skip_rows=0):
                         yield chunk
                         chunk = []
                 row_count += 1
-                
+
             if skipped_count > 0:
                 logger.info(f"Skipped {skipped_count} rows from {csv_file}")
-                
+
             if chunk:
                 yield chunk
     except FileNotFoundError:
@@ -215,51 +215,51 @@ def read_multiple_csv_files(chunk_size=1000, skip_rows=0):
     csv_files = [
         'http_triggers.csv',
         'http_triggers 2.csv',
-        'http_triggers 3.csv', 
+        'http_triggers 3.csv',
         'http_triggers 4.csv'
     ]
-    
+
     # Find existing files
     existing_files = [f for f in csv_files if os.path.exists(f)]
-    
+
     if not existing_files:
         logger.error("No CSV files found!")
         return
-    
+
     logger.info(f"Found {len(existing_files)} CSV file(s): {existing_files}")
-    
+
     # Track total rows to skip across files
     remaining_skip = skip_rows
-    
+
     # Process each file
     for csv_file in existing_files:
         logger.info(f"Reading {csv_file}...")
         try:
             # Calculate how many rows to skip in this file
             current_skip = remaining_skip if remaining_skip > 0 else 0
-            
+
             # Read chunks from this file
             chunks_read = 0
             for chunk in read_csv_in_chunks(csv_file, chunk_size, current_skip):
                 yield chunk
                 chunks_read += len(chunk)
-                
+
             # Update remaining skip count
             # We need to know total rows in file to properly skip across files
             # For now, we'll apply skip only to first file
             remaining_skip = 0
-            
+
         except Exception as e:
             logger.error(f"Error reading {csv_file}: {e}")
             continue
 
-def trigger_webhooks_parallel(csv_file, base_rate_limit, starting_rate_limit, max_rate_limit, 
+def trigger_webhooks_parallel(csv_file, base_rate_limit, starting_rate_limit, max_rate_limit,
                             window_size, error_threshold, max_workers, skip_rows=0):
     try:
         # Count total webhooks first
         total_requests = 0
         all_webhooks = []
-        
+
         # For Railway deployment with multiple files
         if csv_file == "AUTO":
             logger.info(f"Reading webhooks from multiple CSV files... (skipping first {skip_rows} rows)")
@@ -272,7 +272,7 @@ def trigger_webhooks_parallel(csv_file, base_rate_limit, starting_rate_limit, ma
             for chunk in read_csv_in_chunks(csv_file, chunk_size=1000, skip_rows=skip_rows):
                 all_webhooks.extend(chunk)
                 total_requests += len(chunk)
-        
+
         if not all_webhooks:
             logger.warning("No valid webhook URLs found in CSV.")
             return
@@ -292,7 +292,7 @@ def trigger_webhooks_parallel(csv_file, base_rate_limit, starting_rate_limit, ma
                     executor.submit(make_request, url, method, payload, header, 3, rate_limiter, pbar, results_tracker): url
                     for url, method, payload, header in all_webhooks
                 }
-                
+
                 for future in as_completed(future_to_url):
                     try:
                         error = future.result()
@@ -307,7 +307,7 @@ def trigger_webhooks_parallel(csv_file, base_rate_limit, starting_rate_limit, ma
                     if pbar.n % window_size == 0 and pbar.n > 0 and error_window:
                         error_rate = sum(error_window) / len(error_window)
                         current_rate_limit = rate_limiter.get_rate()
-                        
+
                         if error_rate > error_threshold:
                             new_rate_limit = min(max_rate_limit, current_rate_limit * 1.2)
                             rate_limiter.adjust_rate(new_rate_limit)
@@ -319,12 +319,12 @@ def trigger_webhooks_parallel(csv_file, base_rate_limit, starting_rate_limit, ma
 
         # Save results
         results_tracker.save_results()
-        
+
         # Print summary
         successful = sum(1 for r in results_tracker.results if r['status'] == 'success')
         failed = sum(1 for r in results_tracker.results if r['status'] == 'failed')
         logger.info(f"\nFinished processing all webhooks. Success: {successful}, Failed: {failed}")
-        
+
         sys.stdout.flush()
 
     except FileNotFoundError:
@@ -349,7 +349,7 @@ def keep_alive():
     """Keep the container running after webhook processing"""
     logger.info("Webhook processing completed. Keeping container alive...")
     logger.info("Container will run indefinitely. Check logs for webhook results.")
-    
+
     try:
         while True:
             time.sleep(3600)  # Sleep for 1 hour intervals
@@ -363,7 +363,7 @@ if __name__ == "__main__":
         # Deployment mode
         config = load_config()
         logger.info(f"Configuration: {config}")
-        
+
         # Process webhooks
         trigger_webhooks_parallel(
             "AUTO",  # Special flag to read multiple CSV files
@@ -375,13 +375,13 @@ if __name__ == "__main__":
             config['MAX_WORKERS'],
             config['SKIP_ROWS']
         )
-        
+
         # Keep container alive if configured
         if config['KEEP_ALIVE']:
             keep_alive()
         else:
             logger.info("KEEP_ALIVE is disabled. Container will exit.")
-            
+
     else:
         # Local mode with command line arguments
         parser = argparse.ArgumentParser(description="Trigger webhooks with dynamic rate adjustment.")
@@ -392,7 +392,7 @@ if __name__ == "__main__":
 
         # Load configuration
         config = load_config()
-        
+
         # Override with config file if provided
         if args.config:
             try:
@@ -402,9 +402,9 @@ if __name__ == "__main__":
                     logger.info(f"Loaded configuration from {args.config}")
             except Exception as e:
                 logger.warning(f"Could not load config file: {e}. Using defaults.")
-        
+
         logger.info(f"Configuration: {config}")
-        
+
         # Process webhooks
         trigger_webhooks_parallel(
             args.csv_file,
@@ -416,7 +416,7 @@ if __name__ == "__main__":
             config['MAX_WORKERS'],
             config['SKIP_ROWS']
         )
-        
+
         # Keep alive if requested
         if args.keep_alive or config['KEEP_ALIVE']:
             keep_alive()
