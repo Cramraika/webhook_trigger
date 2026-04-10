@@ -25,6 +25,15 @@ python webhook_trigger.py http_triggers.csv        # Local: run with CSV file
 python webhook_trigger.py http_triggers.csv --keep-alive  # Keep process alive after completion
 ```
 
+## n8n Workflow Automation
+
+This project can trigger and receive n8n workflows at `https://n8n.chinmayramraika.in`.
+
+- **Webhook URL:** Set in `N8N_WEBHOOK_URL` env var
+- **API Key:** Set in `N8N_API_KEY` env var (unique per project)
+- **Auth Header:** `X-API-Key: <N8N_API_KEY>`
+- **Workflow repo:** github.com/Cramraika/n8n-workflows (private)
+
 ## Security Rules
 - NEVER hardcode API keys, secrets, or credentials in any file
 - NEVER pass credentials as inline env vars in Bash commands
