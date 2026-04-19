@@ -166,6 +166,26 @@ Per-project MCP disables (reduce static preamble cost — no UI in this repo): `
 - Refactors to match successor's architecture (churn without value — just migrate consumers)
 - Docs expansion beyond this CLAUDE.md + `docs/ENVIRONMENTS.md`
 
+## Observability
+
+Not wired. As an archived single-file utility, there is no Sentry, no Prometheus, no tracing. Operators rely on:
+
+- **Local runs**: `webhook_results.json` output + stdout
+- **Railway deploys (legacy)**: Railway dashboard logs only
+- **Coolify deploys (legacy)**: Coolify container logs
+
+For new observability needs, run the successor `bulk` (Docker-native, where instrumentation is practical).
+
+## Doc Maintainers
+
+| Doc | Posture | Update trigger |
+|---|---|---|
+| `CLAUDE.md` | **Live-but-frozen** — deprecation notice + `bulk` pointer is authoritative | Only on rename, license change, or archive-date event |
+| `README.md` | Frozen 1-line placeholder | Never (consumers read `docs/ENVIRONMENTS.md` or successor) |
+| `docs/ENVIRONMENTS.md` | Frozen | Only if a legacy operator reports migration friction |
+
+Doc-maintainer: repo owner (Chinmay). Claude edits only on explicit request; preamble auto-sync via `~/.claude/scripts/sync-preambles.py` remains active even on archived repos.
+
 ## Deviations from Universal Laws
 
 Intentional deviations from `universal-claudemd.md` for this repo's deprecated state:
