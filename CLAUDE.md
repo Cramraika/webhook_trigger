@@ -1,4 +1,4 @@
-# Webhook Trigger
+# Webhook Trigger (archived — see `bulk`)
 
 ## Claude Preamble
 <!-- VERSION: 2026-04-19-v9 -->
@@ -10,30 +10,30 @@
 
 ## Deprecation Notice
 
-**STATUS: SUPERSEDED — maintenance-only.**
+**STATUS: ARCHIVED on GitHub (2026-04-19) — superseded by `bulk`.**
 
-This repo (`SMPL562/webhook_trigger`) is the v1 prototype of a bulk webhook firing utility. It has been **superseded by `Cramraika/bulk_api_trigger`** (v2.0 platform rewrite with Docker, renovate, config-driven design, ~191KB application vs this 17KB single-file script).
+This repo is the v1 prototype of a bulk webhook firing utility. It has been **superseded by `Cramraika/bulk`** (renamed from `Cramraika/bulk_api_trigger` 2026-04-19; v2.0 platform rewrite with Docker, renovate, config-driven design, ~191KB application vs this 17KB single-file script).
 
-- **New work → `bulk_api_trigger`**: feature additions, bug fixes, deployment changes.
-- **Here → no new features**: accept security patches + migration nudges only. Every CLAUDE.md edit to this file should ask first: "does this belong in bulk_api_trigger instead?" If yes, stop.
-- **Migration path for active users**: switch CSV + env config to bulk_api_trigger format (compatible schema; see bulk_api_trigger CLAUDE.md).
-- **Archive-on-GitHub candidate**: user may archive this repo once remaining users are migrated; kept un-archived for now so ops teams with existing Railway/Coolify deploys aren't broken.
-- **Superseded date**: 2026-04-12 (first bulk_api_trigger commit day).
+- **New work → `bulk`**: feature additions, bug fixes, deployment changes.
+- **Here → no new features**: local dir retained for reference only. No commits expected.
+- **Migration path for active users**: switch CSV + env config to `bulk` format (compatible schema; see `~/Documents/Github/bulk/CLAUDE.md`).
+- **GitHub archive date**: 2026-04-19.
+- **Superseded date**: 2026-04-12 (first `bulk_api_trigger`/`bulk` commit day).
 
 ## Status & Tier
 
 | Field | Value |
 |---|---|
-| **Tier** | C (maintenance-only, superseded) |
-| **Lifecycle** | Deprecated; no feature work; accept security-critical patches only |
-| **Ownership** | SMPL562 org; user still holds write access via PAT |
-| **Push policy** | Local commits only — SMPL562 PAT auth blocks push from this workstation; escalate to GitHub UI if a push is truly required |
+| **Tier** | X (archived on GitHub) |
+| **Lifecycle** | Archived; no feature work; no new commits expected |
+| **Ownership** | Cramraika (archived) |
+| **Push policy** | None — archived on GitHub 2026-04-19 |
 
 ## References
 
 - `~/.claude/conventions/universal-claudemd.md` — universal laws, MCP routing, rent rubric, context ceilings
-- `~/.claude/conventions/project-hygiene.md` — doc placement, cleanup triggers, local-only workspaces
-- Successor: `~/Documents/Github/bulk_api_trigger/CLAUDE.md`
+- `~/.claude/conventions/project-hygiene.md` — doc placement, cleanup triggers, local-only workspaces, § Rename Propagation Protocol
+- Successor: `~/Documents/Github/bulk/CLAUDE.md`
 - Inventory: `~/.claude/conventions/repo-inventory.md`
 
 ## Stack
@@ -45,15 +45,15 @@ This repo (`SMPL562/webhook_trigger`) is the v1 prototype of a bulk webhook firi
 
 ## Active Role-Lanes
 
-Minimal surface — maintenance-only repo:
+Minimal surface — archived repo:
 
-- **Engineer** (security patches, dependency bumps)
-- **Manager** (migration planning, archival timing)
+- **Engineer** (if a legacy operator needs migration help)
+- **Manager** (historical reference only)
 
-Deactivated (belong in successor instead):
+Deactivated (belong in successor `bulk` instead):
 
 - Designer, Analyst, SEO, Writer, Marketer — N/A (CLI tool, internal)
-- Feature-Engineer — all new feature work routes to `bulk_api_trigger`
+- Feature-Engineer — all new feature work routes to `bulk` (renamed from `bulk_api_trigger` 2026-04-19)
 
 ## Build / Test / Deploy
 
@@ -102,7 +102,7 @@ webhook_trigger/
 - No persistent state — crash recovery via `webhook_results.json` only
 - No notification on completion/failure
 - Single-threaded rate limiter caps true concurrency
-- Resolved in successor (`bulk_api_trigger`): config.yaml schema, Docker-based deploy, renovate-tracked deps, 191KB feature-expanded application
+- Resolved in successor (`bulk`, renamed from `bulk_api_trigger` 2026-04-19): config.yaml schema, Docker-based deploy, renovate-tracked deps, 191KB feature-expanded application
 
 ## Security & Secrets
 
@@ -119,12 +119,12 @@ webhook_trigger/
 | **Railway** | legacy existing deploy | worker dyno (`Procfile`); `DEPLOYMENT_MODE` or `RAILWAY_ENVIRONMENT` env |
 | **Coolify** | `http://31.97.43.125:11000` | Nixpacks build; `DEPLOYMENT_MODE=1` env |
 
-New deployments should use `bulk_api_trigger` instead — Docker-native, config-driven, renovate-tracked.
+New deployments should use `bulk` (renamed from `bulk_api_trigger` 2026-04-19) instead — Docker-native, config-driven, renovate-tracked.
 
 ## External Services (MCPs, integrations)
 
 - **n8n** (`https://n8n.chinmayramraika.in`) — `N8N_WEBHOOK_URL` + `N8N_API_KEY` env vars; auth via `X-API-Key` header
-- **GitHub** — SMPL562 org; PAT in `$SMPL562_PAT` (push currently blocked from this workstation)
+- **GitHub** — Cramraika (archived 2026-04-19); no push expected
 
 Per-project MCP disables (reduce static preamble cost — no UI in this repo): `figma`, `serena`, `context7` candidates per `universal-claudemd.md` §6.
 
@@ -139,28 +139,27 @@ Per-project MCP disables (reduce static preamble cost — no UI in this repo): `
 - **2026-04-10** — n8n workflow automation integration (`150566e`).
 - **2026-04-12** — **SUPERSEDED** by `bulk_api_trigger` v2.0 (Cramraika). Platform rewrite: Docker, renovate, config.yaml, expanded feature surface.
 - **2026-04-18 → 2026-04-19** — CLAUDE.md preamble sync passes (v4 → v8) as universal conventions evolved; this body not refreshed until now.
+- **2026-04-19** — **ARCHIVED on GitHub**. `bulk_api_trigger` renamed to `bulk` on the same date. All successor references updated.
 
 ## Dependency Graph
 
 **Upstream (this repo is ancestor of):**
-- `Cramraika/bulk_api_trigger` — **downstream successor**; forked concept + rewritten. Not a git-fork relationship (independent repo); conceptual descent. All new feature work flows there.
+- `Cramraika/bulk` (renamed from `bulk_api_trigger` 2026-04-19) — **downstream successor**; forked concept + rewritten. Not a git-fork relationship (independent repo); conceptual descent. All new feature work flows there.
 
 **Upstream of this repo (none):**
 - No parent project. This repo was the original v1.
 
 **Current consumers (legacy):**
-- Any existing Railway/Coolify deployment still pointing at this repo's build
-- CI/CD workflows (SMPL562) that shell out to this repo's Python script
+- Any existing Railway/Coolify deployment still pointing at this repo's build (should migrate to `bulk`)
 - Operations team CLI runs on operator workstations
 
-**Migration target for all consumers:** `bulk_api_trigger` (switch CSV format if needed, rewire deploy source, update env vars per new `.env.example`).
+**Migration target for all consumers:** `bulk` (renamed from `bulk_api_trigger` 2026-04-19) — switch CSV format if needed, rewire deploy source, update env vars per new `.env.example`.
 
 ## Roadmap
 
-- **Immediate (maintenance)**: accept pip-audit-surfaced CVE patches via `requirements.txt` bumps. No feature PRs.
-- **Short-term (consumer migration)**: migrate remaining Railway/Coolify deploys to `bulk_api_trigger`. Track via inventory notes in `~/.claude/conventions/repo-inventory.md`.
-- **Medium-term (archive decision)**: once zero active consumers, archive on GitHub with note "superseded by Cramraika/bulk_api_trigger". User-gated decision — not auto.
-- **Post-archive**: retain code history via GitHub archive (read-only). No delete.
+- **Post-archive status (current)**: repo archived on GitHub 2026-04-19. No further commits expected. Local dir retained for operator reference.
+- **Consumer migration** (external): any remaining Railway/Coolify deploys should move to `bulk`. Tracked via inventory notes in `~/.claude/conventions/repo-inventory.md`.
+- **Final cleanup (future)**: once zero active legacy consumers confirmed, consider removing local dir as well. User-gated decision.
 
 **Not on the roadmap** (explicitly rejected):
 - New features here (route to successor)
