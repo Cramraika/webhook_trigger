@@ -35,3 +35,14 @@ Thumbs.db
 
 # VS Code
 .vscode/
+.gitnexus
+
+# graphify outputs (per universal-claudemd v21 §44)
+graphify-out/
+
+# Agent-tool caches (per project-hygiene — always gitignored, never committed)
+.cgcignore
+.gitnexusignore
+.serena/
+.claude/skills/
+lychee.toml
