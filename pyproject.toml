@@ -1,0 +1,19 @@
+# Local tooling marker — added 2026-06-23 for vulture compatibility (OW-503; see universal-claudemd.md §44).
+# IMPORTANT: NO [project] table on purpose. This repo is not a pip-installable package;
+# an empty [project] would make deptry/build tools treat it as one. The file exists only
+# to carry the [tool.vulture] exclude block below.
+
+[tool.vulture]
+# Universal-default vulture config (v37 + OW-503 vendored-exclude hardening).
+# The vendored excludes stop vulture recursing into .venv/site-packages/node_modules —
+# a deeply-nested generated file there (e.g. sympy resolvent_lookup.py, AST depth 568)
+# blows Python's recursion limit and aborts the whole scan (OW-503).
+min_confidence = 80
+ignore_decorators = ["@app.route", "@router.", "@pytest.fixture"]
+exclude = [
+    "tests/", "migrations/",
+    ".venv/", "venv/", "*/.venv/", "*/venv/",
+    "site-packages/", "*/site-packages/",
+    "node_modules/", "*/node_modules/",
+    ".git/", "*/.next/", "build/", "dist/", "__pycache__/",
+]
